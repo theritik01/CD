@@ -67,3 +67,25 @@ void main()
 		t=t+10;
 	}
 }
+/*
+Consider the following grammar and eliminate left recursion-
+
+A → ABd / Aa / a
+
+B → Be / b
+
+ 
+
+Solution-
+ 
+
+The grammar after eliminating left recursion is-
+
+A → aA’
+
+A’ → BdA’ / aA’ / ∈
+
+B → bB’
+
+B’ → eB’ / ∈
+*/
