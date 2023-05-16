@@ -77,7 +77,170 @@ exit(0);}
 
 //Enter the expression: a=b+c-d
 
+/*
+#include <iostream>
+#include <stack>
+#include <string>
+#include <iomanip>
+#include <set>
+#include <map>
+#include <vector>
+#include <algorithm>
+using namespace std;
 
+const set<char> OPERATORS = {'+', '-', '*', '/', '(', ')'};
+map<char, int> PRI = {{'+', 1}, {'-', 1}, {'*', 2}, {'/', 2}};
+
+string infix_to_postfix(string expression) {
+    string postfix;
+    stack<char> s;
+    for (char ch : expression) {
+        if (OPERATORS.find(ch) == OPERATORS.end()) {
+            postfix += ch;
+        } else if (ch == '(') {
+            s.push(ch);
+        } else if (ch == ')') {
+            while (!s.empty() && s.top() != '(') {
+                postfix += s.top();
+                s.pop();
+            }
+            s.pop();
+        } else {
+            while (!s.empty() && s.top() != '(' && PRI[ch] <= PRI[s.top()]) {
+                postfix += s.top();
+                s.pop();
+            }
+            s.push(ch);
+        }
+    }
+    while (!s.empty()) {
+        postfix += s.top();
+        s.pop();
+    }
+    return postfix;
+}
+
+string infix_to_prefix(string expression) {
+    reverse(expression.begin(), expression.end());
+    for (int i = 0; i < expression.length(); i++) {
+        if (expression[i] == '(') {
+            expression[i] = ')';
+            i++;
+        } else if (expression[i] == ')') {
+            expression[i] = '(';
+            i++;
+        }
+    }
+    string prefix = infix_to_postfix(expression);
+    reverse(prefix.begin(), prefix.end());
+    return prefix;
+}
+
+void generate3AC(string pos) {
+    stack<string> stack;
+    int t = 1;
+    for (char ch : pos) {
+        if (OPERATORS.find(ch) == OPERATORS.end()) {
+            stack.push(string(1, ch));
+        } else {
+            string op2 = stack.top();
+            stack.pop();
+            string op1 = stack.top();
+            stack.pop();
+            stack.push("t(" + to_string(t) + ")");
+            cout << "t(" << t << ")" << " = " << op1 << " " << ch << " " << op2 << endl;
+            t++;
+        }
+    }
+}
+
+void generateQuadruple(string pos) {
+    stack<string> stack;
+    vector<string> op;
+    int x = 1;
+    for (char ch : pos) {
+        if (OPERATORS.find(ch) == OPERATORS.end()) {
+            stack.push(string(1, ch));
+        } else if (ch == '-') {
+            string op1 = stack.top();
+            stack.pop();
+            stack.push("t(" + to_string(x) + ")");
+            cout << setw(4) << ch << " |" << setw(5) << op1 << " | (-) | t(" << x << ")" << endl;
+            x++;
+            if (!stack.empty()) {
+                string op2 = stack.top();
+                stack.pop();
+                string op1 = stack.top();
+                stack.pop();
+                cout << setw(4) << "+" << " |" << setw(5) << op1 << " |" << setw(5) << op2 << " | t(" << x <<
+")" << endl;
+stack.push("t(" + to_string(x) + ")");
+x++;
+}
+} else {
+string op2 = stack.top();
+stack.pop();
+string op1 = stack.top();
+stack.pop();
+stack.push("t(" + to_string(x) + ")");
+cout << setw(4) << ch << " |" << setw(5) << op1 << " |" << setw(5) << op2 << " | t(" << x << ")" << endl;
+x++;
+}
+}
+}
+
+void generateTriple(string pos) {
+stack<string> stack;
+vector<string> op;
+int x = 1;
+for (char ch : pos) {
+if (OPERATORS.find(ch) == OPERATORS.end()) {
+stack.push(string(1, ch));
+} else if (ch == '-') {
+string op1 = stack.top();
+stack.pop();
+stack.push("t(" + to_string(x) + ")");
+cout << setw(4) << ch << " |" << setw(5) << op1 << " | (-)" << endl;
+x++;
+if (!stack.empty()) {
+string op2 = stack.top();
+stack.pop();
+string op1 = stack.top();
+stack.pop();
+cout << setw(4) << "+" << " |" << setw(5) << op1 << " | (-) |" << setw(5) << op2 << endl;
+stack.push("t(" + to_string(x) + ")");
+x++;
+}
+} else {
+string op2 = stack.top();
+stack.pop();
+string op1 = stack.top();
+stack.pop();
+stack.push("t(" + to_string(x) + ")");
+cout << setw(4) << ch << " |" << setw(5) << op1 << " | (-) | t(" << x << ")" << endl;
+x++;
+}
+}
+
+}
+
+int main() {
+string expression;
+cout << "INPUT THE EXPRESSION: ";
+getline(cin, expression);
+string pos = infix_to_postfix(expression);
+string pre = infix_to_prefix(expression);
+cout << "The 3 Address code for the given expression" << endl;
+generate3AC(pos);
+cout << "The Quadriple for the given expression" << endl;
+cout << " OP | ARG 1 | ARG 2  | RESULT " << endl;
+generateQuadruple(pos);
+cout << "The triple for the given expression" << endl;
+cout << " OP | ARG 1 | ARG 2" << endl;
+generateTriple(pos);
+return 0;
+}
+*/
 
 
 /*OPERATORS = set(['+', '-', '*', '/', '(', ')'])
