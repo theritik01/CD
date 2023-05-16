@@ -1,292 +1,176 @@
-#include <iostream>
-#include <iomanip>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <queue>
+#include<iostream>
+#include<bits/stdc++.h>
 using namespace std;
+void print(vector<vector<vector<int> > > table){
+	cout<<"  STATE/INPUT  |";
+	char a='a';
+	for(int i=0;i<table[0].size()-1;i++){
+		cout<<"   "<<a++<<"   |";
+	}
+	cout<<"   ^   "<<endl<<endl;
+	for(int i=0;i<table.size();i++){
+		cout<<"       "<<i<<"      ";
+		for(int j=0;j<table[i].size();j++){
+			cout<<" | ";
+			for(int k=0;k<table[i][j].size();k++){
+				cout<<table[i][j][k]<<" ";
 
-class NFA
-{
-public:
-  vector<char> states;
-  vector<char> inputSymbols;
-  unordered_map<char, unordered_map<char, vector<char>>> transitionFn;
-  char startState;
-  vector<char> finalStates;
-
-  NFA(vector<char> &states, vector<char> &inputSymbols, unordered_map<char, unordered_map<char, vector<char>>> &transitionFn, char &startState, vector<char> &finalStates)
-  {
-    this->states = states;
-    this->inputSymbols = inputSymbols;
-    this->transitionFn = transitionFn;
-    this->startState = startState;
-    this->finalStates = finalStates;
-  }
-};
-
-class DFA
-{
-public:
-  vector<int> states;
-  vector<char> inputSymbols;
-  unordered_map<int, unordered_map<char, int>> transitionFn;
-  int startState;
-  vector<int> finalStates;
-};
-
-unordered_map<char, unordered_set<char>> findeClosure(NFA &nfa)
-{
-  unordered_map<char, unordered_set<char>> eClosure;
-  for (char c : nfa.states)
-  {
-    queue<char> q;
-    unordered_set<char> visited;
-    q.push(c);
-    visited.insert(c);
-    while (!q.empty())
-    {
-      char srcState = q.front();
-      q.pop();
-      vector<char> destStates = nfa.transitionFn[srcState]['$'];
-      for (char destState : destStates)
-      {
-        if (visited.find(destState) == visited.end())
-        {
-          visited.insert(destState);
-          q.push(destState);
-        }
-      }
-    }
-    for (auto eReachableState : visited)
-    {
-      eClosure[c].insert(eReachableState);
-    }
-  }
-
-  return eClosure;
+			}
+		}
+		cout<<endl;
+	}
 }
 
-void printeClosure(NFA &nfa, unordered_map<char, unordered_set<char>> &eClosure)
-{
-  cout << "Epsilon Closures are:";
-  for (char state : nfa.states)
-  {
-    cout << "\nState " << state << ": ";
-    for (char c : eClosure[state])
-    {
-      cout << c << " ";
-    }
-  }
+void printdfa(vector<vector<int> > states, vector<vector<vector<int> > > dfa){
+	cout<<"  STATE/INPUT  ";
+	char a='a';
+	for(int i=0;i<dfa[0].size();i++){
+		cout<<"|   "<<a++<<"   ";
+	}
+	cout<<endl;
+	for(int i=0;i<states.size();i++){
+		cout<<"{ ";
+		for(int h=0;h<states[i].size();h++)
+			cout<<states[i][h]<<" ";
+		if(states[i].empty()){
+			cout<<"^ ";
+		}
+		cout<<"} ";
+		for(int j=0;j<dfa[i].size();j++){
+			cout<<" | ";
+			for(int k=0;k<dfa[i][j].size();k++){
+				cout<<dfa[i][j][k]<<" ";
+
+			}
+			if(dfa[i][j].empty()){
+				cout<<"^ ";
+			}
+		}
+		cout<<endl;
+	}
 }
-
-void printMappings(unordered_map<int, unordered_set<char>> &mappedStates)
-{
-  cout << "\n\nMapped states are:\n";
-  cout << "DFA == NFA\n";
-  int n = mappedStates.size();
-  for (int i = 0; i < n; i++)
-  {
-    cout << i << " == ";
-    for (auto c : mappedStates[i])
-    {
-      cout << c << ", ";
-    }
-    cout << "\b\b \n";
-  }
+vector<int> closure(int s,vector<vector<vector<int> > > v){
+	vector<int> t;
+	queue<int> q;
+	t.push_back(s);
+	int a=v[s][v[s].size()-1].size();
+	for(int i=0;i<a;i++){
+		t.push_back(v[s][v[s].size()-1][i]);
+		//cout<<"t[i]"<<t[i]<<endl;
+		q.push(t[i]);
+	}
+	while(!q.empty()){
+		int f=q.front();
+		q.pop();
+		if(!v[f][v[f].size()-1].empty()){
+			int u=v[f][v[f].size()-1].size();
+			for(int i=0;i<u;i++){
+				int y=v[f][v[f].size()-1][i];
+				if(find(t.begin(),t.end(),y)==t.end()){
+					//cout<<"y"<<y<<endl;
+					t.push_back(y);
+					q.push(y);
+				}
+			}
+		}
+	}
+	return t;
 }
+int main(){
+	int n,alpha;
+	cout<<"Enter total number of states in NFA : ";
+	cin>>n;
+	cout<<"Enter number of elements in alphabet : ";
+	cin>>alpha;
+	vector<vector<vector<int> > > table;
+	for(int i=0;i<n;i++){
+		cout<<"For state "<<i<<endl;
+		vector< vector< int > > v;
+		char a='a';
+		int y,yn;
+		for(int j=0;j<alpha;j++){
+			vector<int> t;
+			cout<<"Enter no. of output states for input "<<a++<<" : ";
+			cin>>yn;
+			cout<<"Enter output states :"<<endl;
+			for(int k=0;k<yn;k++){
+				cin>>y;
+				t.push_back(y);
+			}
+			v.push_back(t);
+		}
+		vector<int> t;
+		cout<<"Enter no. of output states for input ^ : ";
+		cin>>yn;
+		cout<<"Enter output states :"<<endl;
+		for(int k=0;k<yn;k++){
+			cin>>y;
+			t.push_back(y);
+		}
+		v.push_back(t);
+		table.push_back(v);
+	}
+	cout<<"***** TRANSITION TABLE OF NFA *****"<<endl;
+	print(table);
+	cout<<endl<<"***** TRANSITION TABLE OF DFA *****"<<endl;
+	vector<vector<vector<int> > > dfa;
+	vector<vector<int> > states;
+	states.push_back(closure(0,table));
+	queue<vector<int> > q;
+	q.push(states[0]);
+	while(!q.empty()){
+		vector<int> f=q.front();
+		q.pop();
+		vector<vector<int> > v;
+		for(int i=0;i<alpha;i++){
+			vector<int> t;
+			set<int> s;
+			for(int j=0;j<f.size();j++){
 
-DFA convertNFAtoDFA(NFA &nfa)
-{
-  unordered_map<char, unordered_set<char>> eClosure = findeClosure(nfa);
-  printeClosure(nfa, eClosure);
-
-  DFA dfa;
-  dfa.inputSymbols = nfa.inputSymbols;
-  dfa.startState = 0;
-  int noOfDFAStates = 1;
-  unordered_map<int, unordered_set<char>> mappedStates;
-  queue<int> q;
-  q.push(0);
-  mappedStates[0] = eClosure[nfa.startState];
-
-  while (!q.empty())
-  {
-    int dfaState = q.front();
-    q.pop();
-    for (char symbol : nfa.inputSymbols)
-    {
-      unordered_set<char> reach;
-      unordered_set<char> nfaStates = mappedStates[dfaState];
-      for (char srcState : nfaStates)
-      {
-        vector<char> destStates = nfa.transitionFn[srcState][symbol];
-        for (char destState : destStates)
-        {
-          unordered_set<char> s = eClosure[destState];
-          reach.insert(s.begin(), s.end());
-        }
-      }
-
-      int found = -1;
-      for (int i = 0; i < noOfDFAStates; i++)
-      {
-        if (mappedStates[i] == reach)
-        {
-          found = i;
-          break;
-        }
-      }
-      if (found != -1)
-      {
-        dfa.transitionFn[dfaState][symbol] = found;
-      }
-      else
-      {
-        dfa.transitionFn[dfaState][symbol] = noOfDFAStates;
-        mappedStates[noOfDFAStates] = reach;
-        q.push(noOfDFAStates);
-        noOfDFAStates++;
-      }
-    }
-  }
-
-  printMappings(mappedStates);
-  for (int i = 0; i < noOfDFAStates; i++)
-  {
-    dfa.states.push_back(i);
-  }
-
-  auto &states1 = nfa.finalStates;
-  for (int i = 0; i < noOfDFAStates; i++)
-  {
-    auto &states2 = mappedStates[i];
-    for (auto c1 : states1)
-    {
-      if (states2.find(c1) != states2.end())
-      {
-        dfa.finalStates.push_back(i);
-        break;
-      }
-    }
-  }
-
-  return dfa;
+				for(int k=0;k<table[f[j]][i].size();k++){
+					vector<int> cl= closure(table[f[j]][i][k],table);
+					for(int h=0;h<cl.size();h++){
+						if(s.find(cl[h])==s.end())
+						s.insert(cl[h]);
+					}
+				}
+			}
+			for(set<int >::iterator u=s.begin(); u!=s.end();u++)
+				t.push_back(*u);
+			v.push_back(t);
+			if(find(states.begin(),states.end(),t)==states.end())
+			{
+				states.push_back(t);
+				q.push(t);
+			}
+		}
+		dfa.push_back(v);
+	}
+	printdfa(states,dfa);
 }
-
-void printNFA(NFA &nfa)
-{
-  int width = 6;
-  cout << "Given NFA:\n";
-  cout << "States: ";
-  for (char c : nfa.states)
-  {
-    cout << c << ", ";
-  }
-
-  cout << "\b\b \nInput symbols: ";
-  for (char c : nfa.inputSymbols)
-  {
-    cout << c << ", ";
-  }
-
-  cout << "\b\b \nTransition Function:\n";
-  cout << setw(width) << "";
-  for (char c : nfa.inputSymbols)
-  {
-    cout << setw(width) << c;
-  }
-  cout << setw(width) << "$" << endl;
-  for (char srcState : nfa.states)
-  {
-    cout << setw(width) << srcState;
-    for (char symbol : nfa.inputSymbols)
-    {
-      vector<char> destStates = nfa.transitionFn[srcState][symbol];
-      string str = "";
-      for (char state : destStates)
-      {
-        str += state;
-      }
-      cout << setw(width) << str;
-    }
-    vector<char> destStates = nfa.transitionFn[srcState]['$'];
-    string str = "";
-    for (char state : destStates)
-    {
-      str += state;
-    }
-    cout << setw(width) << str << endl;
-  }
-
-  cout << "Start State: " << nfa.startState;
-  cout << "\nFinal States: ";
-  for (char c : nfa.finalStates)
-  {
-    cout << c << ", ";
-  }
-  cout << "\b\b \n\n";
-}
-
-void printDFA(DFA &dfa)
-{
-  int width = 6;
-  cout << "\n\nThe converted DFA is:\n";
-  cout << "States: ";
-  for (int i : dfa.states)
-  {
-    cout << i << ", ";
-  }
-
-  cout << "\b\b \nInput symbols: ";
-  for (char c : dfa.inputSymbols)
-  {
-    cout << c << ", ";
-  }
-
-  cout << "\b\b \nTransition Function:\n";
-  cout << setw(width) << "";
-  for (char c : dfa.inputSymbols)
-  {
-    cout << setw(width) << c;
-  }
-  for (int srcState : dfa.states)
-  {
-    cout << endl
-         << setw(width) << srcState;
-    for (char symbol : dfa.inputSymbols)
-    {
-      int destState = dfa.transitionFn[srcState][symbol];
-      cout << setw(width) << destState;
-    }
-  }
-
-  cout << "\nStart State: " << dfa.startState;
-  cout << "\nFinal States: ";
-  for (int c : dfa.finalStates)
-  {
-    cout << c << ", ";
-  }
-  cout << "\b\b \n\n";
-}
-
-int main()
-{
-  cout << "---Conversion of epsilon-NFA to DFA---\n";
-  cout << "---Note: Epsilon has been denoted by $ in this program---\n\n";
-
-  vector<char> states = {'A', 'B', 'C'};
-  vector<char> inputSymbols = {'0', '1'};
-  unordered_map<char, unordered_map<char, vector<char>>> transitionFn = {
-      {'A', {{'0', {'B', 'C'}}, {'1', {'A'}}, {'$', {'B'}}}},
-      {'B', {{'0', {}}, {'1', {'B'}}, {'$', {'C'}}}},
-      {'C', {{'0', {'C'}}, {'1', {'C'}}, {'$', {}}}},
-  };
-  char startState = 'A';
-  vector<char> finalStates = {'C'};
-
-  NFA nfa(states, inputSymbols, transitionFn, startState, finalStates);
-  printNFA(nfa);
-  DFA dfa = convertNFAtoDFA(nfa);
-  printDFA(dfa);
-}
+/*Enter total number of states in NFA : 3
+Enter number of elements in alphabet : 2
+For state 0
+Enter no. of output states for input a : 2
+Enter output states :
+0 1
+Enter no. of output states for input b : 1
+Enter output states :
+0
+Enter no. of output states for input ^ : 0
+Enter output states :
+For state 1
+Enter no. of output states for input a : 0
+Enter output states :
+Enter no. of output states for input b : 1
+Enter output states :
+2
+Enter no. of output states for input ^ : 0
+Enter output states :
+For state 2
+Enter no. of output states for input a : 0
+Enter output states :
+Enter no. of output states for input b : 0
+Enter output states :
+Enter no. of output states for input ^ : 0
+*/
