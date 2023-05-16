@@ -1,87 +1,123 @@
-#include<iostream>
-#include<string>
-#include<unordered_map>
-using namespace std;
-
-class DAG
+#include<stdio.h>
+#include<string.h>
+int i=1,j=0,no=0,tmpch=90;
+char str[100],left[15],right[15];
+void findopr();
+void explore();
+void fleft(int);
+void fright(int);
+struct exp
 {
-    public:
-    char label;
-    char data;
-    DAG* left;
-    DAG* right;
-
-    DAG(char x){
-        label = '_';
-        data = x;
-        left = NULL;
-        right = NULL;
-    }
-    DAG(char lb, char x, DAG* lt, DAG* rt){
-        label = lb;
-        data = x;
-        left = lt;
-        right = rt;
-    }
-};
-
+ int pos;
+ char op;
+}k[15];
 int main()
 {
-    int n;
-    cout << "Enter the number of strings: ";
-    cin >> n;
-    string st[n];
-    unordered_map<char, DAG*> labelDAGNode;
 
-    // Input strings
-    cout << "Enter the strings:" << endl;
-    for(int i=0; i<n; i++){
-        cin >> st[i];
-    }
+ printf("\t\tINTERMEDIATE CODE GENERATION OF DAG\n\n");
+ 
+ scanf("%s",str);
+ printf("The intermediate code:\t\tExpression\n");
+ findopr();
+ explore();
+ 
+}
+void findopr()
+{
+ for(i=0;str[i]!='\0';i++)
+  if(str[i]==':')
+  {
+  k[j].pos=i;
+  k[j++].op=':';
+  }
+ for(i=0;str[i]!='\0';i++)
+  if(str[i]=='/')
+  {
+  k[j].pos=i;
+  k[j++].op='/';
+  }
+ for(i=0;str[i]!='\0';i++)
+  if(str[i]=='*')
+  {
+  k[j].pos=i;
+  k[j++].op='*';
+  }
+ for(i=0;str[i]!='\0';i++)
+  if(str[i]=='+')
+  {
+  k[j].pos=i;
+  k[j++].op='+';
+  }
+ for(i=0;str[i]!='\0';i++)
+  if(str[i]=='-')
+  {
+  k[j].pos=i;
+  k[j++].op='-';
+  }
+}
+void explore()
+{
+ i=1;
+ while(k[i].op!='\0')
+ {
+  fleft(k[i].pos);
+  fright(k[i].pos);
+  str[k[i].pos]=tmpch--;
+  printf("\t%c := %s%c%s\t\t",str[k[i].pos],left,k[i].op,right);
+  for(j=0;j <strlen(str);j++)
+   if(str[j]!='$')
+    printf("%c",str[j]);
+  printf("\n");
+  i++;
+ }
+ fright(-1);
+ if(no==0)
+ {
+  fleft(strlen(str));
+  printf("\t%s := %s",right,left);
+ }
+ printf("\t%s :=  %c",right,str[k[--i].pos]);
 
-    // Construct DAG
-    for(int i=0; i<n; i++){
-        string stTemp = st[i];
-        char tempLabel = stTemp[0];
-        char tempLeft = stTemp[2];
-        char tempData = stTemp[3];
-        char tempRight = stTemp[4];
-        DAG* leftPtr;
-        DAG* rightPtr;
-        if(labelDAGNode.count(tempLeft) == 0){
-            leftPtr = new DAG(tempLeft);
-        }
-        else{
-            leftPtr = labelDAGNode[tempLeft];
-        }
-        if(labelDAGNode.count(tempRight) == 0){
-            rightPtr = new DAG(tempRight);
-        }
-        else{
-            rightPtr = labelDAGNode[tempRight];
-        }
-        DAG* nn = new DAG(tempLabel,tempData,leftPtr,rightPtr);
-        labelDAGNode.insert(make_pair(tempLabel,nn));
-    }
-
-    // Print DAG
-    cout<<"Label      ptr      leftPtr       rightPtr"<<endl;
-    for(int i=0; i<n; i++){
-        DAG* x = labelDAGNode[st[i][0]];
-        cout << st[i][0] << "            " << x->data << "            ";
-        if(x->left->label == '_') cout << x->left->data;
-        else cout << x->left->label;
-        cout << "          ";
-        if(x->right->label == '_') cout << x->right->data;
-        else cout << x->right->label;
-        cout << endl;
-    }
-    return 0;
+}
+void fleft(int x)
+{
+ int w=0,flag=0;
+ x--;
+ while(x!= -1 &&str[x]!= '+' &&str[x]!='*'&&str[x]!='='&&str[x]!='\0'&&str[x]!='-'&&str[x]!='/'&&str[x]!=':')
+ {
+  if(str[x]!='$'&& flag==0)
+  {
+  left[w++]=str[x];
+  left[w]='\0';
+  str[x]='$';
+  flag=1;
+  }
+  x--;
+ }
+}
+void fright(int x)
+{
+ int w=0,flag=0;
+ x++;
+ while(x!= -1 && str[x]!= '+'&&str[x]!='*'&&str[x]!='\0'&&str[x]!='='&&str[x]!=':'&&str[x]!='-'&&str[x]!='/')
+ {
+  if(str[x]!='$'&& flag==0)
+  {
+  right[w++]=str[x];
+  right[w]='\0';
+  str[x]='$';
+  flag=1;
+  }
+  x++;
+ }
 }
 
-
-//enter no of strings:3
-//enter strings:
-//A=x+y
-//B=A*z
-//C=B/w
+/*
+a=a*-c+b*-c
+The intermediate code:          Expression
+        Z := b*         a=a*-c+Z-c
+        Y := c+Z                a=a*-Y-c
+        X := c-Y                a=a*X-c
+        W := X-c                a=a*W
+        a := W  a :=  $
+        */
