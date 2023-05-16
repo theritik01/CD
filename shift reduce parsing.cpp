@@ -1,64 +1,72 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<string.h>
 using namespace std;
-int n;
-string s;
-vector<char> st;
-vector<char> a;
-
-void StackAndInput(){ //print stack and input vector elements
-  cout<<"\n$";
-  for(auto x: st)
-      cout<<x;
-  cout<<"\t";
-  for(auto x : a)
-      cout<<x;
-}
-void check()  //check if there any reduction possible for stack elements
+struct prodn
 {
-    for(int i=0;i<st.size();i++)
-    {
-        if(st[i]=='a')
-        {
-            st[i]='E';
-            StackAndInput();
-            cout<<"$\t"<<"REDUCE E->a";
-            check(); // we again do checking because here we may need to reduce continousely
-        }
-        if(i+2<st.size() && st[i]=='E'&& (st[i+1]==('+') || st[i+1]==('*')) && st[i+2]=='E')
-        {
-            st.pop_back();
-            st.pop_back();
-            StackAndInput();
-            if(st[i+1]=='+')
-              cout<<"$\t"<<"REDUCE E->E+E";
-            else if(st[i+1]=='*')
-              cout<<"$\t"<<"REDUCE E->E*E";
-        }
-    }
-}
+	char p1[10];
+	char p2[10];
+};
 int main()
 {
-    cout<<"GRAMMAR is : D\n E->E+E \n E->E*E \n E->a\n";
-    cout<<"Enter input string ";
-    cin>>s;
-    n=s.length();
-    for(int i=0;i<n;i++)
-      a.push_back(s[i]);
-
-    cout<<"\nstack\t input\taction";
-    for(int i=0;i<n;i++)
-    {
-        st.push_back(a[i]);
-        a[i]=' '; // replace element with space so that it not visible in output
-        StackAndInput();
-        cout<<"$\t"<<"SHIFT->"<<st.back();
-        check();
-    }
-    if(st.size()==1 && st[0]=='E')
-        cout<<"\n\nstring accepted";
-    else
-        cout<<"\n\nstring rejected";
+	char input[20],stack[50],temp[50],ch[2],*t1,*t2,*t;
+	int i,j,s1,s2,s,count=0;
+	struct prodn p[10];
+	FILE *fp=fopen("sr_input.txt","r");
+	stack[0]='\0';
+	cout<<"Enter the Input String: ";
+	cin>>input;
+	while(!feof(fp))
+	{
+		fscanf(fp,"%s\n",temp);
+		t1=strtok(temp,"->");
+		t2=strtok(NULL,"->");
+		strcpy(p[count].p1,t1);
+		strcpy(p[count].p2,t2);
+		count++;
+	}
+	i=0;
+	while(1)
+	{
+		if(i<strlen(input))
+		{
+			ch[0]=input[i];
+			ch[1]='\0';
+			i++;
+			strcat(stack,ch);
+			cout<<"\n"<<stack;
+		}
+		for(j=0;j<count;j++)
+		{
+			t=strstr(stack,p[j].p2);
+			if(t!=NULL)
+			{
+				s1=strlen(stack);
+				s2=strlen(t);
+				s=s1-s2;
+				stack[s]='\0';
+				strcat(stack,p[j].p1);
+				cout<<"\n"<<stack;
+				j=-1;
+			}
+		}
+		if(strcmp(stack,"E")==0&&i==strlen(input))
+		{
+			cout<<"\n\nAccepted";
+			break;
+		}
+		if(i==strlen(input))
+		{
+			cout<<"\n\nNot Accepted";
+			break;
+		}
+	}
+	return 0;
 }
 
+//a+a*a
 
-//input string:a+a*a
+/* make sr_input.txt file
+E->E+E
+E->E*E
+E->i
+*/
