@@ -16,5 +16,5 @@ All the weekly lab work of the subject 18CSC304J Compiler Design.
 <li>Design and develop a simple code generator (back end of the compiler) using C/ C++/ Java
 <li>Implement the construction of DAG using C/ C++/ Java
 <li>Implement Global Data Flow Analysis using C/ C++/ Java
-<li>IImplement any one storage allocation strategies(heap, stack, static) using C/ C++/ Java
+<li>Implement any one storage allocation strategies(heap, stack, static) using C/ C++/ Java
 </ol>
